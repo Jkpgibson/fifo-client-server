@@ -36,7 +36,7 @@ void process_newchannel_request (FIFORequestChannel *_channel){
 }
 
 void populate_file_data (int person){
-	//cout << "populating for person " << person << endl;
+	cout << "populating for person " << person << endl;
 	string filename = "BIMDC/" + to_string(person) + ".csv";
 	char line[100];
 	ifstream ifs (filename.c_str());
