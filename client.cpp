@@ -18,8 +18,10 @@ int main(int argc, char *argv[]){
     FIFORequestChannel chan ("control", FIFORequestChannel::CLIENT_SIDE);
 
     // sending a non-sense message, you need to change this
+
     char x = 55;
-    chan.cwrite (&x, sizeof (x));
+    datamsg foo = datamsg(5, 0.010, 1);
+    chan.cwrite (&foo, sizeof (foo));
     char* buf = chan.cread ();
 
 
