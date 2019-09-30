@@ -6,6 +6,7 @@
  */
 #include "common.h"
 #include "FIFOreqchannel.h"
+#include <fstream>
 
 using namespace std;
 
@@ -17,12 +18,21 @@ int main(int argc, char *argv[]){
 
     FIFORequestChannel chan ("control", FIFORequestChannel::CLIENT_SIDE);
 
-    // sending a non-sense message, you need to change this
+    //Task 1
+    ofstream x_1("x1.csv");
+    for (double i = 0; i <= 59.996; i+= 0.04){
+        datamsg ecg_1 = datamsg(1, i, 1);
+        datamsg ecg_2 = datamsg(1, i, 2);
+        chan.cwrite (&ecg_1, sizeof(ecg_1));
+        char* buf1 = chan.cread ();
+        chan.cwrite (&ecg_2, sizeof(ecg_2));
+        char* buf2 = chan.cread ();
 
-    char x = 55;
-    datamsg foo = datamsg(5, 0.010, 1);
-    chan.cwrite (&foo, sizeof (foo));
-    char* buf = chan.cread ();
+        if (x_1.is_open()){
+            x_1 << *((double*) buf1) << "," << *((double*) buf2) << endl;
+        }
+    }
+    x_1.close();
 
 
     // closing the channel    
