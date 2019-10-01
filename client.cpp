@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
     // Begin Task 1
     auto start = chrono::steady_clock::now();
     ofstream x_1("x1.csv");
-    for (double i = 0; i <= 59.996; i+= 0.004){
+    for (double i = 0.000; i <= 59.996; i+= 0.004){
         datamsg ecg_1 = datamsg(1, i, 1);
         datamsg ecg_2 = datamsg(1, i, 2);
         chan.cwrite (&ecg_1, sizeof(ecg_1));
