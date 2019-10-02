@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
 
     FIFORequestChannel chan ("control", FIFORequestChannel::CLIENT_SIDE);
 
-    // Begin Task 1
+    // Begin Task 1 (on windows use --strip-trailing-cr flag with diff)
     auto start = chrono::steady_clock::now();
     ofstream x_1("x1.csv");
     for (double i = 0.000; i <= 59.996; i+= 0.004){
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
         char* buf2 = chan.cread ();
 
         if (x_1.is_open()){
-            x_1 << i << "," << *((double*) buf1) << "," << *((double*) buf2) << endl;
+            x_1 << i << "," << *((double*) buf1) << "," << *((double*) buf2) << "\n";
         }
     }
     x_1.close();
