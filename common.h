@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/wait.h>
 
 using namespace std;
 
