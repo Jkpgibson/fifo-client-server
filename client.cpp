@@ -40,6 +40,7 @@ int main(int argc, char *argv[]){
     cout << elapsed << " milliseconds" << endl;
     // End Task 1
 
+    // Begin Task 2
 
     // closing the channel    
     MESSAGE_TYPE m = QUIT_MSG;
