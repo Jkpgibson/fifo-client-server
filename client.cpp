@@ -8,7 +8,7 @@
 #include "FIFOreqchannel.h"
 #include <fstream>
 #include <chrono>
-
+#include <string.h>
 
 using namespace std;
 
@@ -49,24 +49,33 @@ int main(int argc, char *argv[]){
         // End Task 1
 
         // Begin Task 2
-        // filemsg data = filemsg(0, 0);
-        // chan.cwrite(data, sizeof(data));
+        std::string fname = "1.csv";
+        filemsg fm = filemsg(0, 0);
+        int buf_size = sizeof(filemsg) + fname.length() + 1;
+        char* msg_buf = new char[buf_size];
+        memcpy(msg_buf, &fm, sizeof(fm));
+        strcpy(msg_buf + sizeof(filemsg), fname.c_str());
+        chan.cwrite(&msg_buf, buf_size);
+        // char* foo = chan.cread();
+        // std::cout << *foo << std::endl;
+
         // End Task 2
 
         // Begin Task 3
-        MESSAGE_TYPE new_msg = NEWCHANNEL_MSG;
-        chan.cwrite(&new_msg, sizeof(MESSAGE_TYPE));
-        char* newChanName = chan.cread();
-        FIFORequestChannel new_chan (newChanName, FIFORequestChannel::CLIENT_SIDE);
-        datamsg test = datamsg(1, 0.008, 1);
-        new_chan.cwrite(&test, sizeof(test));
-        char* buf = new_chan.cread ();
-        cout << *((double*)buf) << "\n";
+        // MESSAGE_TYPE new_msg = NEWCHANNEL_MSG;
+        // chan.cwrite(&new_msg, sizeof(MESSAGE_TYPE));
+        // char* newChanName = chan.cread();
+        // FIFORequestChannel new_chan (newChanName, FIFORequestChannel::CLIENT_SIDE);
+        // datamsg test = datamsg(1, 0.008, 1);
+        // new_chan.cwrite(&test, sizeof(test));
+        // char* buf = new_chan.cread ();
+        // cout << *((double*)buf) << "\n";
         // End Task 3
 
         // closing the channel    
         MESSAGE_TYPE m = QUIT_MSG;
         chan.cwrite (&m, sizeof (MESSAGE_TYPE));
+        // new_chan.cwrite(&m, sizeof(MESSAGE_TYPE));
         wait(&server_status);
     }   
 }
