@@ -49,32 +49,35 @@ int main(int argc, char *argv[]){
         // End Task 1
 
         // Begin Task 2
-        std::ofstream fout("y2.csv", ios::binary);
+        // auto start = chrono::steady_clock::now();
+        // ofstream fout("bintest", ios::binary);
 
-        std::string fname = "2.csv";
-        filemsg size_fm = filemsg(0, 0);
-        int buf_size = sizeof(filemsg) + fname.length() + 1;
-        char* size_msg = new char[buf_size];
-        memcpy(size_msg, &size_fm, sizeof(filemsg));
-        strcpy(size_msg + sizeof(filemsg), fname.c_str());
-        chan.cwrite(size_msg, buf_size);
-        __int64_t size = *(__int64_t*) chan.cread();
+        // string fname = "test1";
+        // filemsg size_fm = filemsg(0, 0);
+        // int buf_size = sizeof(filemsg) + fname.length() + 1;
+        // char* size_msg = new char[buf_size];
+        // memcpy(size_msg, &size_fm, sizeof(filemsg));
+        // strcpy(size_msg + sizeof(filemsg), fname.c_str());
+        // chan.cwrite(size_msg, buf_size);
+        // __int64_t size = *(__int64_t*) chan.cread();
 
 
-        for (int i = 0; i < size; i+= 256) {
-            if (i + 256 < size) {
-                filemsg fm = filemsg(i, MAX_MESSAGE);
-                chan.cwrite(&fm, sizeof(fm));
-                fout.write(chan.cread(), MAX_MESSAGE);
-            }
-            else {
-                filemsg fm = filemsg(i, size % 256);
-                chan.cwrite(&fm, sizeof(fm));
-                fout.write(chan.cread(), size % 256);
-            }
+        // for (int i = 0; i < size; i+= 256) {
+        //     if (i + 256 < size) {
+        //         filemsg fm = filemsg(i, MAX_MESSAGE);
+        //         chan.cwrite(&fm, sizeof(fm));
+        //         fout.write(chan.cread(), MAX_MESSAGE);
+        //     }
+        //     else {
+        //         filemsg fm = filemsg(i, size % 256);
+        //         chan.cwrite(&fm, sizeof(fm));
+        //         fout.write(chan.cread(), size % 256);
+        //     }
 
-        }
-
+        // }
+        // auto end = chrono::steady_clock::now();
+        // int64_t elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+        // cout << elapsed << " milliseconds" << endl;
         // End Task 2
 
         // Begin Task 3
