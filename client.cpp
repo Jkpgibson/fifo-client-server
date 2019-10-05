@@ -49,15 +49,23 @@ int main(int argc, char *argv[]){
         // End Task 1
 
         // Begin Task 2
+        std::ofstream fout("y1.csv", ios::binary);
+
         std::string fname = "1.csv";
-        filemsg fm = filemsg(0, 0);
+        filemsg size_fm = filemsg(0, 0);
         int buf_size = sizeof(filemsg) + fname.length() + 1;
-        char* msg_buf = new char[buf_size];
-        memcpy(msg_buf, &fm, sizeof(fm));
-        strcpy(msg_buf + sizeof(filemsg), fname.c_str());
-        chan.cwrite(&msg_buf, buf_size);
-        // char* foo = chan.cread();
-        // std::cout << *foo << std::endl;
+        char* size_msg = new char[buf_size];
+        memcpy(size_msg, &size_fm, sizeof(filemsg));
+        strcpy(size_msg + sizeof(filemsg), fname.c_str());
+        chan.cwrite(size_msg, buf_size);
+        __int64_t size = *(__int64_t*) chan.cread();
+
+        for (int i = 0; i <= size; i+= 256) {
+            if (size % 256)
+            filemsg fm = filemsg(i, MAX_MESSAGE);
+            chan.cwrite(&fm, sizeof(fm));
+            fout.write(chan.cread(), MAX_MESSAGE);
+        }
 
         // End Task 2
 

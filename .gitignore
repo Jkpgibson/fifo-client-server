@@ -3,3 +3,4 @@ common.o
 FIFOreqchannel.o
 dataserver
 x1.csv
+.vscode/settings.json
