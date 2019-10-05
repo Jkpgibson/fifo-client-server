@@ -12,8 +12,37 @@
 
 using namespace std;
 
-
 int main(int argc, char *argv[]){
+    int option = 0;
+    int patient = 0;
+    double time = 0.000;
+    int ecg = 0;
+    char* req_filename = NULL;
+
+    while ((option = getopt(argc, argv, "p:t:e:f:c")) != -1) {
+        switch (option) {
+            case 'p':
+                patient = atoi(optarg);
+                break;
+                
+            case 't':
+                time = atof(optarg);
+                break;
+                
+            case 'e':
+                ecg = atoi(optarg);    
+                break; 
+                        
+            case 'f':
+                req_filename = optarg;  
+                break;
+                
+            case 'c':
+                cout << "requesting new channel" << endl; 
+                
+                  
+        }
+    }
     int server_status;
     if(!fork()){
         execvp("./dataserver", argv);
@@ -26,33 +55,71 @@ int main(int argc, char *argv[]){
         FIFORequestChannel chan ("control", FIFORequestChannel::CLIENT_SIDE);
 
         // Begin Task 1 (on windows use --strip-trailing-cr flag with diff)
-        /*
-        auto start = chrono::steady_clock::now();
-        ofstream x_1("x1.csv");
-        for (double i = 0.000; i <= 59.996; i+= 0.004){
-            datamsg ecg_1 = datamsg(1, i, 1);
-            datamsg ecg_2 = datamsg(1, i, 2);
-            chan.cwrite (&ecg_1, sizeof(ecg_1));
-            char* buf1 = chan.cread ();
-            chan.cwrite (&ecg_2, sizeof(ecg_2));
-            char* buf2 = chan.cread ();
+        
+        if (patient){        
+            auto start = chrono::steady_clock::now();
+            ofstream x_1("x1.csv");
+            if (patient && !time && !ecg) {
+                for (double i = 0.000; i <= 59.996; i+= 0.004){
+                    datamsg ecg_1 = datamsg(patient, i, 1);
+                    datamsg ecg_2 = datamsg(patient, i, 2);
+                    chan.cwrite (&ecg_1, sizeof(ecg_1));
+                    char* buf1 = chan.cread ();
+                    chan.cwrite (&ecg_2, sizeof(ecg_2));
+                    char* buf2 = chan.cread ();
 
-            if (x_1.is_open()){
-                x_1 << i << "," << *((double*) buf1) << "," << *((double*) buf2) << "\n";
+                    if (x_1.is_open()){
+                        x_1 << i << ',' << *((double*) buf1) << ',' <<  *((double*) buf2) << endl;
+                    }
+                }
             }
+            else if (patient && time && ecg) {
+                
+                datamsg data = datamsg(patient, time, ecg);
+                chan.cwrite (&data, sizeof(data));
+                char* buf = chan.cread ();
+
+                if (x_1.is_open()){
+                    x_1 << time << "," << *((double*) buf) << endl;
+                }
+            }
+            else if (patient && time && !ecg) {
+                datamsg ecg_1 = datamsg(patient, time, ecg);
+                chan.cwrite (&ecg_1, sizeof(ecg_1));
+                char* buf1 = chan.cread ();
+                datamsg ecg_2 = datamsg(patient, time, ecg);
+                chan.cwrite (&ecg_2, sizeof(ecg_2));
+                char* buf2 = chan.cread ();
+
+                if (x_1.is_open()){
+                    x_1 << time << ',' << *((double*) buf1) << ',' << *((double*) buf2);
+                }
+            }
+            else if (patient && !time && ecg) {
+                for (double i = 0.000; i <= 59.996; i+= 0.004){
+                    datamsg data = datamsg(patient, i, ecg);
+                    chan.cwrite (&data, sizeof(data));
+                    char* buf = chan.cread ();
+
+                    if (x_1.is_open()){
+                        x_1 << i << ',' << *((double*) buf) << endl;
+                    }
+                }
+            }
+            x_1.close();
+            auto end = chrono::steady_clock::now();
+            int64_t elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+            cout << elapsed << " milliseconds" << endl;
         }
-        x_1.close();
-        auto end = chrono::steady_clock::now();
-        int64_t elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-        cout << elapsed << " milliseconds" << endl;
-        */
+        
         // End Task 1
 
         // Begin Task 2
-        // auto start = chrono::steady_clock::now();
-        // ofstream fout("bintest", ios::binary);
 
-        // string fname = "test1";
+        // auto start = chrono::steady_clock::now();
+        // ofstream fout("y1.csv", ios::binary);
+
+        // string fname = req_filename;
         // filemsg size_fm = filemsg(0, 0);
         // int buf_size = sizeof(filemsg) + fname.length() + 1;
         // char* size_msg = new char[buf_size];
@@ -78,9 +145,11 @@ int main(int argc, char *argv[]){
         // auto end = chrono::steady_clock::now();
         // int64_t elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
         // cout << elapsed << " milliseconds" << endl;
+
         // End Task 2
 
         // Begin Task 3
+
         // MESSAGE_TYPE new_msg = NEWCHANNEL_MSG;
         // chan.cwrite(&new_msg, sizeof(MESSAGE_TYPE));
         // char* newChanName = chan.cread();
@@ -89,6 +158,7 @@ int main(int argc, char *argv[]){
         // new_chan.cwrite(&test, sizeof(test));
         // char* buf = new_chan.cread ();
         // cout << *((double*)buf) << "\n";
+
         // End Task 3
 
         // closing the channel    
