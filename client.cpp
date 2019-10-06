@@ -18,6 +18,7 @@ int main(int argc, char *argv[]){
     double time = 0.000;
     int ecg = 0;
     char* req_filename = NULL;
+    bool channel_request = false;
 
     while ((option = getopt(argc, argv, "p:t:e:f:c")) != -1) {
         switch (option) {
@@ -38,7 +39,8 @@ int main(int argc, char *argv[]){
                 break;
                 
             case 'c':
-                cout << "requesting new channel" << endl; 
+                channel_request = true;
+                break;
                 
                   
         }
@@ -109,62 +111,63 @@ int main(int argc, char *argv[]){
             x_1.close();
             auto end = chrono::steady_clock::now();
             int64_t elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-            cout << elapsed << " milliseconds" << endl;
+            std::cout << elapsed << " milliseconds" << endl;
         }
         
         // End Task 1
 
         // Begin Task 2
+        if (req_filename) {
+            auto start = chrono::steady_clock::now();
+            ofstream fout("y1.csv", ios::binary);
 
-        // auto start = chrono::steady_clock::now();
-        // ofstream fout("y1.csv", ios::binary);
-
-        // string fname = req_filename;
-        // filemsg size_fm = filemsg(0, 0);
-        // int buf_size = sizeof(filemsg) + fname.length() + 1;
-        // char* size_msg = new char[buf_size];
-        // memcpy(size_msg, &size_fm, sizeof(filemsg));
-        // strcpy(size_msg + sizeof(filemsg), fname.c_str());
-        // chan.cwrite(size_msg, buf_size);
-        // __int64_t size = *(__int64_t*) chan.cread();
+            string fname = req_filename;
+            filemsg size_fm = filemsg(0, 0);
+            int buf_size = sizeof(filemsg) + fname.length() + 1;
+            char* size_msg = new char[buf_size];
+            memcpy(size_msg, &size_fm, sizeof(filemsg));
+            strcpy(size_msg + sizeof(filemsg), fname.c_str());
+            chan.cwrite(size_msg, buf_size);
+            __int64_t size = *(__int64_t*) chan.cread();
 
 
-        // for (int i = 0; i < size; i+= 256) {
-        //     if (i + 256 < size) {
-        //         filemsg fm = filemsg(i, MAX_MESSAGE);
-        //         chan.cwrite(&fm, sizeof(fm));
-        //         fout.write(chan.cread(), MAX_MESSAGE);
-        //     }
-        //     else {
-        //         filemsg fm = filemsg(i, size % 256);
-        //         chan.cwrite(&fm, sizeof(fm));
-        //         fout.write(chan.cread(), size % 256);
-        //     }
+            for (int i = 0; i < size; i+= 256) {
+                if (i + 256 < size) {
+                    filemsg fm = filemsg(i, MAX_MESSAGE);
+                    chan.cwrite(&fm, sizeof(fm));
+                    fout.write(chan.cread(), MAX_MESSAGE);
+                }
+                else {
+                    filemsg fm = filemsg(i, size % 256);
+                    chan.cwrite(&fm, sizeof(fm));
+                    fout.write(chan.cread(), size % 256);
+                }
 
-        // }
-        // auto end = chrono::steady_clock::now();
-        // int64_t elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-        // cout << elapsed << " milliseconds" << endl;
-
+            }
+            auto end = chrono::steady_clock::now();
+            int64_t elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+            std::cout << elapsed << " milliseconds" << endl;
+        }
         // End Task 2
 
         // Begin Task 3
 
-        // MESSAGE_TYPE new_msg = NEWCHANNEL_MSG;
-        // chan.cwrite(&new_msg, sizeof(MESSAGE_TYPE));
-        // char* newChanName = chan.cread();
-        // FIFORequestChannel new_chan (newChanName, FIFORequestChannel::CLIENT_SIDE);
-        // datamsg test = datamsg(1, 0.008, 1);
-        // new_chan.cwrite(&test, sizeof(test));
-        // char* buf = new_chan.cread ();
-        // cout << *((double*)buf) << "\n";
-
+        if (channel_request){            
+            MESSAGE_TYPE new_msg = NEWCHANNEL_MSG;
+            chan.cwrite(&new_msg, sizeof(MESSAGE_TYPE));
+            char* newChanName = chan.cread();
+            FIFORequestChannel new_chan (newChanName, FIFORequestChannel::CLIENT_SIDE);
+            datamsg test = datamsg(1, 0.008, 1);
+            new_chan.cwrite(&test, sizeof(test));
+            char* buf = new_chan.cread ();
+            MESSAGE_TYPE m = QUIT_MSG;
+            new_chan.cwrite(&m, sizeof(MESSAGE_TYPE));
+        }
         // End Task 3
 
         // closing the channel    
         MESSAGE_TYPE m = QUIT_MSG;
         chan.cwrite (&m, sizeof (MESSAGE_TYPE));
-        // new_chan.cwrite(&m, sizeof(MESSAGE_TYPE));
         wait(&server_status);
     }   
 }
