@@ -81,9 +81,9 @@ int main(int argc, char *argv[]){
                 chan.cwrite (&data, sizeof(data));
                 char* buf = chan.cread ();
 
-                if (x_1.is_open()){
-                    x_1 << time << "," << *((double*) buf) << endl;
-                }
+                // if (x_1.is_open()){
+                    std::cout << time << "," << *((double*) buf) << endl;
+                // }
             }
             else if (patient && time && !ecg) {
                 datamsg ecg_1 = datamsg(patient, time, ecg);
